@@ -1,0 +1,49 @@
+server:
+  port: 8082
+
+# database configuration
+spring:
+  datasource:
+    driverClassName: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/microservices
+    username:
+    password:
+  jpa:
+    hibernate.ddl-auto: update
+    generate-ddl: false
+    show-sql: false
+    hibernate:
+      naming:
+        implicit-strategy: org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy
+  application:
+    name: USER-SERVICE
+  zipkin:
+    base-url: http://localhost:9411
+
+# actuator configuration
+management:
+  health:
+    circuit-breakers:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: always
+
+# resilience4j configuration
+resilience4j:
+  circuit-breaker:
+    instances:
+      userService:
+        register-health-indicator: true
+        event-consumer-buffer-size: 10
+        failure-rate-threshold: 50
+        minimum-number-of-calls: 5
+        automatic-transition-from-open-to-half-open-enabled: true
+        wait-duration-in-open-state: 5s
+        permitted-number-of-calls-in-half-open-state: 3
+        sliding-window-size: 10
+        sliding-window-type: count_based
